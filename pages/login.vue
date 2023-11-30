@@ -1,5 +1,3 @@
-<!-- Registration.vue -->
-
 <template>
   <div>
     <div id="container">
@@ -13,7 +11,8 @@
           <br /><br />
           <label for="submit"></label>
           <button class="my-button" type="submit" name="submit" id="submit">LOGIN</button><br>
-          <p>Click to <NuxtLink href="/registration">Registration</NuxtLink></p>
+          <p>Click to <NuxtLink href="/registration">Registration</NuxtLink>
+          </p>
         </fieldset>
       </form>
     </div>
@@ -22,6 +21,17 @@
   
 <script setup>
 import axios from 'axios';
+definePageMeta({
+  middleware: defineNuxtRouteMiddleware((to, from) => {
+    if (typeof localStorage !== 'undefined') {
+      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+      console.log(isAuthenticated);
+      if (isAuthenticated) {
+        return navigateTo('/dashboard');
+      }
+    }
+  }),
+});
 const router = useRouter();
 
 const email = ref('');
@@ -37,8 +47,9 @@ const registerUser = async () => {
     const response = await axios.post('http://127.0.0.1:8000/api/customer/login', data);
     console.log(response.data);
     localStorage.setItem('user', JSON.stringify(response.data.customer_name));
+    localStorage.setItem('isAuthenticated', 'true');
 
-    router.push({ path: '/' });
+    router.push({ path: '/dashboard' });
   } catch (error) {
     console.error(error);
   }
